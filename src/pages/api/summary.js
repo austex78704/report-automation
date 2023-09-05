@@ -1,4 +1,4 @@
-import { OpenAIChat } from "langchain/llms/openai";
+import { OpenAI, OpenAIChat } from "langchain/llms/openai";
 
 const SUMMARY_PROMPT = `Below is the transcript of a customer satisfaction interview, the first part of the interview has quantitative questions where each question has a answer rated out of 10 and the second part of the interview has qualitative or open ended questions. 
 
@@ -37,8 +37,8 @@ const handler = async (req, res) => {
   try {
     const model = new OpenAIChat({
       temperature: 0.1,
-      model: "gpt-3.5-turbo-16k",
-      verbose: true,
+      modelName: "gpt-3.5-turbo-16k",
+      // verbose: true,
     });
     const result = await model.predict(SUMMARY_PROMPT + transcript);
     res.status(200).json(result);
