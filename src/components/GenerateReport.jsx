@@ -255,12 +255,12 @@ export default function GenerateReport({ id }) {
           >
             Download as TXT
           </div>
-          <div
+          {/* <div
             className="rounded-lg cursor-pointer border-2 p-2 w-max mt-2 bg-blue-500 hover:bg-blue-600 text-white transition-colors duration-150 disabled:opacity-40"
             onClick={() => downloadAsPDF("# Transcript \n" + transcript)}
           >
             Download as PDF
-          </div>
+          </div> */}
         </div>
       )}
       {/* {isTranscriptReady && (
@@ -322,12 +322,12 @@ export default function GenerateReport({ id }) {
             >
               Download as TXT
             </div>
-            <div
+            {/* <div
               className="rounded-lg cursor-pointer border-2 p-2 w-max mt-2 bg-blue-500 hover:bg-blue-600 text-white transition-colors duration-150 disabled:opacity-40"
               onClick={() => downloadAsPDF(summary)}
             >
               Download as PDF
-            </div>
+            </div> */}
           </div>
         </div>
       )}
