@@ -5,10 +5,12 @@ import ReactMarkdown from "react-markdown";
 import marked from "marked";
 // import pdf from "html-pdf";
 import dynamic from "next/dynamic";
+import { OpenAI, OpenAIChat } from "langchain/llms/openai";
 
 // const GeneratePdf = dynamic(() => import("./GeneratePDF"), { ssr: false });
 
 import Loader from "../components/Loader";
+import { SUMMARY_PROMPT } from "../lib/prompts";
 
 const wait = (time) => {
   return new Promise((resolve) => {
@@ -144,8 +146,13 @@ export default function GenerateReport({ id }) {
   const generateSummary = async (transcript) => {
     setIsGeneratingSummary(true);
     try {
-      const response = await axios.post("/api/summary", { transcript });
-      setSummary(response.data);
+      const model = new OpenAIChat({
+        temperature: 0.1,
+        modelName: "gpt-3.5-turbo-16k",
+        openAIApiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY,
+      });
+      const result = await model.predict(SUMMARY_PROMPT + transcript);
+      setSummary(result);
     } catch (e) {
       console.log(e);
     }

@@ -3,6 +3,7 @@
 import MarkdownIt from "markdown-it";
 import pdf from "html-pdf";
 import { marked } from "marked";
+import path from "path";
 
 const markdownIt = new MarkdownIt();
 
@@ -24,7 +25,14 @@ export default async (req, res) => {
         bottom: "2cm",
         left: "1cm",
       },
+      phantomPath: path.resolve(
+        process.cwd(),
+        "node_modules/phantomjs-prebuilt/lib/phantom/bin/phantomjs"
+      ),
     };
+
+    // process.env.FONTCONFIG_PATH = path.join(process.cwd(), "my-font-directory");
+    process.env.LD_LIBRARY_PATH = path.join(process.cwd(), "bins");
 
     pdf.create(html, pdfOptions).toBuffer((err, buffer) => {
       if (err) {
