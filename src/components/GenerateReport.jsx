@@ -17,17 +17,20 @@ const wait = (time) => {
 };
 
 const upload = async (file) => {
-  const formData = new FormData();
-
-  formData.append("data", file);
-
-  const response = await axios.post("/api/upload", formData, {
+  const assembly = axios.create({
+    baseURL: "https://api.assemblyai.com/v2",
     headers: {
-      "Content-Type": "multipart/form-data",
+      authorization: process.env.NEXT_PUBLIC_ASSEMBLYAI_API_KEY,
+      "content-type": "application/json",
+      "transfer-encoding": "chunked",
     },
   });
-
-  return response.data.upload_url;
+  try {
+    const response = await assembly.post("/upload", file);
+    return response.data?.upload_url;
+  } catch (e) {
+    console.log(e);
+  }
 };
 
 const transcribe = async (url) => {
@@ -142,7 +145,6 @@ export default function GenerateReport({ id }) {
     setIsGeneratingSummary(true);
     try {
       const response = await axios.post("/api/summary", { transcript });
-      console.log(response.data);
       setSummary(response.data);
     } catch (e) {
       console.log(e);
