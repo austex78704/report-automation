@@ -33,7 +33,7 @@ Transcript:`;
 
 const handler = async (req, res) => {
   const { transcript } = req.body;
-
+  console.log("Generating summary");
   try {
     const model = new OpenAIChat({
       temperature: 0.1,
@@ -43,7 +43,7 @@ const handler = async (req, res) => {
     const result = await model.predict(SUMMARY_PROMPT + transcript);
     res.status(200).json(result);
   } catch (e) {
-    console.error(e);
+    console.log(e);
     res.status(500).json(e);
   }
 };
