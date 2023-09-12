@@ -19,5 +19,3 @@ The area of focus relates to my earlier comment about needing to show models' in
 Make sure the qualitative part is very very detailed.
 
 Transcript:`;
-
-console.log({ SUMMARY_PROMPT });
