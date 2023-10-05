@@ -18,23 +18,6 @@ const wait = (time) => {
   });
 };
 
-const upload = async (file) => {
-  const assembly = axios.create({
-    baseURL: "https://api.assemblyai.com/v2",
-    headers: {
-      authorization: process.env.NEXT_PUBLIC_ASSEMBLYAI_API_KEY,
-      "content-type": "application/json",
-      "transfer-encoding": "chunked",
-    },
-  });
-  try {
-    const response = await assembly.post("/upload", file);
-    return response.data?.upload_url;
-  } catch (e) {
-    console.log(e);
-  }
-};
-
 const transcribe = async (url) => {
   const response = await axios.post("/api/transcribe", { data: { url } });
   const id = response.data.id;
@@ -66,9 +49,24 @@ export default function GenerateReport({ id }) {
   const [isLoading, setIsLoading] = useState(true);
   const [isGeneratingSummary, setIsGeneratingSummary] = useState(false);
 
+  const upload = async (file) => {
+    const formData = new FormData();
+    formData.append("data", file);
+
+    const response = await axios.post("/api/transcribe", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+
+    const transcript =
+      response.data.results.channels[0].alternatives[0].transcript;
+    setTranscript(transcript);
+    setStatus("");
+  };
+
   const downloadAsTXT = (content, filename) => {
     const fileName = filename;
-
     if (!fileName) {
       // user pressed cancel on prompt
       return;
@@ -134,9 +132,9 @@ export default function GenerateReport({ id }) {
       setStatus("uploading");
       const url = await upload(file);
       setStatus("transcribing");
-      const data = await transcribe(url);
-      setTranscript(data.text);
-      setStatus("");
+      // const data = await transcribe(url);
+      // setTranscript(data.text);
+      // setStatus("");
     } catch (error) {
       console.error(error);
       setError(error.message);
@@ -255,12 +253,12 @@ export default function GenerateReport({ id }) {
           >
             Download as TXT
           </div>
-          {/* <div
+          <div
             className="rounded-lg cursor-pointer border-2 p-2 w-max mt-2 bg-blue-500 hover:bg-blue-600 text-white transition-colors duration-150 disabled:opacity-40"
             onClick={() => downloadAsPDF("# Transcript \n" + transcript)}
           >
             Download as PDF
-          </div> */}
+          </div>
         </div>
       )}
       {/* {isTranscriptReady && (
