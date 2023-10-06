@@ -22,20 +22,23 @@ const parseForm = (req) => {
 const handler = async (req, res) => {
   try {
     const { files } = await parseForm(req);
-    console.log(JSON.stringify(files, null, 3));
 
     const buffer = fs.readFileSync(files.data[0].path);
-    console.log({ buffer });
 
     const mimetype = "audio/mpeg";
 
     deepgram.transcription
       .preRecorded(
         { buffer: buffer, mimetype },
-        { smart_format: true, model: "nova", language: "en-US" }
+        {
+          smart_format: true,
+          model: "nova",
+          language: "en-US",
+          paragraphs: true,
+        }
       )
       .then((transcription) => {
-        console.log({ transcription });
+        console.log("Transcription complete");
         res.status(200).json(transcription);
         console.dir(transcription, { depth: null });
       })

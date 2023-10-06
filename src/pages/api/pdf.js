@@ -1,5 +1,29 @@
-import pdf from "html-pdf";
+// pages/api/convertToPdf.js
+
 import { marked } from "marked";
+import puppeteer from "puppeteer";
+
+export async function convertMarkdownToPDF(markdownContent) {
+  const htmlContent = marked(markdownContent);
+
+  const browser = await puppeteer.launch({
+    args: ["--no-sandbox", "--disable-setuid-sandbox"],
+  });
+  const page = await browser.newPage();
+  await page.setContent(htmlContent);
+  const pdfBuffer = await page.pdf({
+    format: "A4",
+    margin: {
+      top: 40,
+      bottom: 40,
+      left: 20,
+      right: 20,
+    },
+  });
+  await browser.close();
+
+  return pdfBuffer;
+}
 
 export default async (req, res) => {
   if (req.method === "POST") {
@@ -9,27 +33,10 @@ export default async (req, res) => {
       return res.status(400).send("Markdown content is required.");
     }
 
-    const html = marked(markdown);
-
-    const pdfOptions = {
-      format: "A4",
-      border: {
-        top: "2cm",
-        right: "1cm",
-        bottom: "2cm",
-        left: "1cm",
-      },
-    };
-
-    pdf.create(html, pdfOptions).toBuffer((err, buffer) => {
-      if (err) {
-        return res.status(500).send(err.message);
-      }
-
-      res.setHeader("Content-Type", "application/pdf");
-      res.setHeader("Content-Disposition", "inline; filename=converted.pdf");
-      res.status(200).send(buffer);
-    });
+    const buffer = await convertMarkdownToPDF(markdown);
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader("Content-Disposition", "inline; filename=converted.pdf");
+    res.status(200).send(buffer);
   } else {
     res.status(405).send("Method not allowed.");
   }

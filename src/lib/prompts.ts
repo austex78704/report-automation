@@ -1,21 +1,11 @@
-export const SUMMARY_PROMPT = `Below is the transcript of a customer satisfaction interview, the first part of the interview has quantitative questions where each question has a answer rated out of 10 and the second part of the interview has qualitative or open ended questions. 
+export const SUMMARY_PROMPT = `Below is the transcript of a customer satisfaction interview 
 
-Please separate the both parts and return everything in markdown format. "Quantitative Part" and "Qualitative Part" should be formatted as headings.
-Quantitative part should be in list format with proper serial numbers and any required sublists. 
-Qualitative part should be a slightly trimmed down version of the transcript with any pleasantries and trivial information removed. Keep the wordings and sentences close to the original transcript.
+Transcript: 
 
-Example Quantitative part:
-XYZ has the requisite software engineering expertise to meet your
-product objectives: 7/10
-XYZ has an in-depth understanding of your technical needs: 8/10
-
-Example Qualitative part: If I understood the request from our developers, currently, it’s possible to show surfaces only in the models, but we also need a way to show interiors. I’m not sure if that’s in development yet, but that’s something we need that’s important to Simcon.
-
-Generally, their communication is very good. We have good personal contact with them. If we have issues, they’re resolved quickly, and the communication is friendly. The overall relationship is a good one. Our developers find their documentation to be accessible and easy to understand.
-
-I don’t have an answer to that.
-
-The area of focus relates to my earlier comment about needing to show models' interiors, not just the surfaces. We’re looking to accelerate our integration with other products, so we need to have both surfaces and interiors. It would be helpful if they could solve the issue of rendering interiors.
-Make sure the qualitative part is very very detailed.
-
-Transcript:`;
+What to do:
+Find all the portions of the transcript where comments, feedback, details, and subjective remarks from the customer are mentioned. Include complete context and details. Each portion should have a small heading. Don't include any objective answers (where rating out of 10 is mentioned). 
+Output format should be like:
+Heading 1: Transcript portion 1 (verbatim, detailed, no fluff)
+Heading 2: Transcript portion 2 (verbatim, detailed, no fluff)
+...
+Heading N: Transcript portion N (verbatim, detailed, no fluff)`;

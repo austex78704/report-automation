@@ -2,12 +2,7 @@ import axios from "axios";
 import clsx from "clsx";
 import { useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
-import marked from "marked";
-// import pdf from "html-pdf";
-import dynamic from "next/dynamic";
-import { OpenAI, OpenAIChat } from "langchain/llms/openai";
-
-// const GeneratePdf = dynamic(() => import("./GeneratePDF"), { ssr: false });
+import { OpenAIChat } from "langchain/llms/openai";
 
 import Loader from "../components/Loader";
 import { SUMMARY_PROMPT } from "../lib/prompts";
@@ -60,7 +55,7 @@ export default function GenerateReport({ id }) {
     });
 
     const transcript =
-      response.data.results.channels[0].alternatives[0].transcript;
+      response.data.results.channels[0].alternatives[0].paragraphs.transcript;
     setTranscript(transcript);
     setStatus("");
   };
@@ -130,11 +125,8 @@ export default function GenerateReport({ id }) {
   const handleTranscription = async () => {
     try {
       setStatus("uploading");
-      const url = await upload(file);
+      await upload(file);
       setStatus("transcribing");
-      // const data = await transcribe(url);
-      // setTranscript(data.text);
-      // setStatus("");
     } catch (error) {
       console.error(error);
       setError(error.message);
@@ -145,11 +137,24 @@ export default function GenerateReport({ id }) {
     setIsGeneratingSummary(true);
     try {
       const model = new OpenAIChat({
-        temperature: 0.1,
-        modelName: "gpt-3.5-turbo-16k",
+        temperature: 0.5,
+        modelName: "gpt-4",
         openAIApiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY,
       });
-      const result = await model.predict(SUMMARY_PROMPT + transcript);
+
+      const input = `Below is the transcript of a customer satisfaction interview 
+
+Transcript: ${transcript}
+
+What to do:
+Find all the portions of the transcript where comments, feedback, details, and subjective remarks from the customer are mentioned. Include complete context and details. Each portion should have a small heading. Don't include any objective answers (where rating out of 10 is mentioned). 
+Output format should be like:
+Heading 1: Transcript portion 1 (verbatim, detailed, no fluff)
+Heading 2: Transcript portion 2 (verbatim, detailed, no fluff)
+...
+Heading N: Transcript portion N (verbatim, detailed, no fluff)`;
+
+      const result = await model.predict(input);
       setSummary(result);
     } catch (e) {
       console.log(e);
@@ -226,6 +231,7 @@ export default function GenerateReport({ id }) {
             "rounded-lg border-2 mt-2 p-2 max-h-64 overflow-y-auto",
             error && "border-red-500"
           )}
+          style={{ whiteSpace: "break-spaces" }}
         >
           {isTranscriptReady ? (
             transcript
@@ -320,12 +326,12 @@ export default function GenerateReport({ id }) {
             >
               Download as TXT
             </div>
-            {/* <div
+            <div
               className="rounded-lg cursor-pointer border-2 p-2 w-max mt-2 bg-blue-500 hover:bg-blue-600 text-white transition-colors duration-150 disabled:opacity-40"
               onClick={() => downloadAsPDF(summary)}
             >
               Download as PDF
-            </div> */}
+            </div>
           </div>
         </div>
       )}
